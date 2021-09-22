@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 
 import {IMAGE_BASE_URL, POSTER_SIZE} from '../config'
 //components
@@ -13,16 +13,52 @@ import BreadCrumb from "./BreadCrumb/BreadCrumb";
 import MovieInfo from "./MovieInfo/MovieInfo";
 import MovieInfoBar from "./MovieInfoBar/MovieInfoBar";
 import Actor from "./Actor/Actor";
+import API from '../API'
 
+class Movie extends Component {
 
-const Movie = () => {
-        const {movieId} = useParams()
-        const {state: movie, loading, error} = useMovieFetch(movieId)
+    state = {
+        movie: {},
+        loading: true,
+        error: false
+    }
 
+    fetchMovie = async () => {
+        const {movieId} = this.props.params
+        try {
+            this.setState({error: false, loading: true})
+
+            const movie = await API.fetchMovie(movieId)
+            const credits = await API.fetchCredits(movieId)
+            //get directors only
+            const directors = credits.crew.filter(member => {
+                return member.job === 'Director'
+            })
+
+            this.setState({
+                movie: {
+                    ...movie,
+                    actors: credits.cast,
+                    directors
+                }, loading: false
+
+            })
+        } catch (error) {
+            this.setState({error: true, loading: false})
+        }
+    }
+
+    componentDidMount() {
+        this.fetchMovie()
+    }
+
+    render() {
+
+        const {movie, loading, error} = this.state
 
         if (loading) return <Spinner/>
         if (error) return <div>Something went wrong...</div>
-
+        console.log({movie})
         return (
             <>
                 <BreadCrumb movieTitle={movie.original_title}/>
@@ -45,6 +81,11 @@ const Movie = () => {
             </>
         );
     }
-;
+}
 
-export default Movie;
+
+const MovieWithParams = props => {
+    return <Movie {...props} params={useParams()}/>
+}
+
+export default MovieWithParams;

@@ -13,6 +13,7 @@ import Thumb from "./Thumb/Thumb";
 import {Spinner} from "./Spinner/Spinner.styles";
 import SearchBar from "./SearchBar/SearchBar";
 import Button from "./Button/Button";
+import SearchBarClassComponent from "./SearchBar/SearchBarClassComponent";
 
 
 const Home = () => {
@@ -37,6 +38,7 @@ const Home = () => {
                        title={state.results[0].original_title}
                        text={state.results[0].overview}/>}
             <SearchBar setSearchTerm={setSearchTerm}/>
+            {/*<SearchBarClassComponent setSearchTerm={setSearchTerm}/>*/}
             <Grid header={searchTerm ? 'Search Result' : 'Popular Movies'}>
                 {state.results.map((movie, index) => (
                     <Thumb key={index}
